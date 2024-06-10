@@ -10,10 +10,15 @@ function addClick(el) {
 }
 
 function toggleClick(el) {
-    console.log("toggleClick called")
     var bullet = el.parentElement
     var jsBullet = new BulletList(JSON.parse(sessionStorage.getItem(bullet.id)))
     jsBullet.toggleComplete()
+}
+
+function editClick(el) {
+    var bullet = el.parentElement;
+    var jsBullet = new BulletList(JSON.parse(sessionStorage.getItem(bullet.id)));
+    jsBullet.toggleReadonly();
 }
 
 class BulletList {
@@ -26,17 +31,19 @@ class BulletList {
             this.numChildren = 0
             this.depth = depth
             this.id = id;
-            this.htmlString=`<p class="bullet" id="${this.id}"><input type="checkbox" onclick="toggleClick(this)"> <label for="${this.id}"> ${this.name} </label><input type="button" onclick="addClick(this)">+</input></p>`;
+            this.readonly = false;
+            this.htmlString=`<p class="bullet" id="${this.id}"><input type="checkbox" onclick="toggleClick(this)"> <input type="text" value=${this.name}><button type="button" onclick="editClick(this)">Edit</button><button type="button" onclick="addClick(this)">+</button></p>`;
         }
     }
 
     altConstructor(bleh){
         this.name = bleh.name;
         this.done = bleh.done;
-        this.numChildren = bleh.numChildren
+        this.numChildren = bleh.numChildren;
         this.depth=bleh.depth;
         this.id = bleh.id;
-        this.htmlString=`<p class="bullet" id="${this.id}"><input type="checkbox" onclick="toggleClick(this)"> <label for="${this.id}"> ${this.name} </label><input type="button" onclick="addClick(this)">+</input></p>`;
+        this.readonly = false;
+        this.htmlString=bleh.htmlString;
     }
 
     addSubBullet(name=null) {
@@ -51,7 +58,6 @@ class BulletList {
     }
     
     toggleComplete(userClicked=false) {
-        console.log("toggleComplete called")
         this.done = !this.done;
         sessionStorage.setItem(this.id,JSON.stringify(this))
         if (!userClicked){
@@ -65,7 +71,6 @@ class BulletList {
     }
     
     checkComplete(){
-        console.log("checkComplete called");
         var children = [];
         var i=0;
         while (i<this.numChildren){
@@ -73,21 +78,16 @@ class BulletList {
             children.push(new BulletList(JSON.parse(sessionStorage.getItem(childId))));
             i+=1;
         }
-        console.log(children)
         var result = true;
-        console.log(result)
         for (let i=0; i<children.length; i++) {
             let child=children[i]
-            console.log(child.done)
             if (!child.done){
                 result=false;
             }
         }
-        console.log(result)
         if (result != this.done){
             this.toggleComplete();
         }
-        console.log(result);
     }
 
     getDOMElement() {
@@ -100,6 +100,18 @@ class BulletList {
             i-=1;
         }
         return this.id.substring(0,i)
+    }
+
+    toggleReadonly() {
+        let textField = this.getDOMElement().children[1]
+        if (!textField.hasAttribute('readonly')) {
+            this.name = textField.value;
+            textField.setAttribute('readonly', 'readonly')
+        } else {
+            textField.removeAttribute('readonly')
+        }
+        this.readonly = !this.readonly;
+        sessionStorage.setItem(this.id,JSON.stringify(this));
     }
 }
 
