@@ -1,0 +1,22 @@
+:root {
+    --bgColor: #000000;
+    --textColor: #D3FBD8;
+    --secondaryColor: #EC87E4;
+    --emphasisColor: #66BAA8;
+}
+
+body{
+    background-color: var(--bgColor);
+    color: var(--textColor);
+}
+
+input, select, textarea {
+    background-color: var(--secondaryColor);
+    color: var(bgColor)
+}
+
+input[readonly] {
+    background-color: var(--bgColor) !important;
+    color: var(--textColor)
+}
+
