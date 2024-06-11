@@ -1,6 +1,17 @@
 // Constants 
 INDENT = 20;
 
+// Dynamic Textfield functionality
+function updateFieldSize(el) {
+    console.log(el.style.height);
+    bulletEl = el.parentElement;
+    numRows = ((el.value.length / 50) | 0) + 1;
+    bulletEl.style.height = 2*numRows.toString()+"ex";
+    el.style.height=2*numRows.toString()+"ex";
+}
+
+// Button / checkbox functionality
+
 function addClick(el) {
     var bullet = el.parentElement
     var jsBullet = new BulletList(JSON.parse(sessionStorage.getItem(bullet.id)))
@@ -21,6 +32,8 @@ function editClick(el) {
     jsBullet.toggleReadonly();
 }
 
+// The Bullet object and related functions
+
 class BulletList {
     constructor(id,name=null,depth=0){
         if (typeof id != "string") {
@@ -32,7 +45,7 @@ class BulletList {
             this.depth = depth
             this.id = id;
             this.readonly = false;
-            this.htmlString=`<p class="bullet" id="${this.id}"><input type="checkbox" onclick="toggleClick(this)"> <input type="text" value=${this.name}><button type="button" onclick="editClick(this)">Edit</button><button type="button" onclick="addClick(this)">+</button></p>`;
+            this.htmlString=`<p class="bullet" id="${this.id}"><input type="checkbox" onclick="toggleClick(this)"> <textarea spellcheck="false" wrap="hard" cols="48" value=${this.name} oninput="updateFieldSize(this)"></textarea><button type="button" onclick="editClick(this)">Save</button><button type="button" onclick="addClick(this)">+</button></p>`;
         }
     }
 
@@ -104,11 +117,14 @@ class BulletList {
 
     toggleReadonly() {
         let textField = this.getDOMElement().children[1]
+        let editButton = this.getDOMElement().children[2]
         if (!textField.hasAttribute('readonly')) {
             this.name = textField.value;
-            textField.setAttribute('readonly', 'readonly')
+            textField.setAttribute('readonly', 'readonly');
+            editButton.innerHTML = "Edit";
         } else {
             textField.removeAttribute('readonly')
+            editButton.innerHTML = "Save"
         }
         this.readonly = !this.readonly;
         sessionStorage.setItem(this.id,JSON.stringify(this));

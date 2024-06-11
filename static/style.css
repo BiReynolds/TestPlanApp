@@ -6,17 +6,27 @@
 }
 
 body{
+    padding: 0px;
     background-color: var(--bgColor);
     color: var(--textColor);
+    align-items:baseline
 }
 
-input, select, textarea {
+input, select, textarea{
+    border: 0;
+    height: 2ex !important;
     background-color: var(--secondaryColor);
-    color: var(bgColor)
+    font-size: 2ex;
+    color: var(--bgColor);
+    resize: none;
 }
 
-input[readonly] {
+textarea[readonly] {
     background-color: var(--bgColor) !important;
-    color: var(--textColor)
+    color: var(--textColor) !important;
 }
 
+button {
+    font-size: 1.5ex;
+    vertical-align:top;
+}
