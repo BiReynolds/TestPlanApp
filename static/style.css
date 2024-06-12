@@ -6,27 +6,43 @@
 }
 
 body{
-    padding: 0px;
+    position:relative;
+    overflow:auto;
+    padding-top: 2px;
     background-color: var(--bgColor);
     color: var(--textColor);
     align-items:baseline
 }
 
 input, select, textarea{
+    vertical-align:top;
     border: 0;
-    height: 2ex !important;
+    height: 1em;
     background-color: var(--secondaryColor);
-    font-size: 2ex;
+    font-size: 16px;
     color: var(--bgColor);
-    resize: none;
+    overflow:hidden;
+}
+
+textarea {
+    resize: vertical;
 }
 
 textarea[readonly] {
+    resize:none;
     background-color: var(--bgColor) !important;
     color: var(--textColor) !important;
 }
 
 button {
-    font-size: 1.5ex;
-    vertical-align:top;
+    vertical-align:middle;
+    border: 0;
+    background-color: var(--secondaryColor);
+    font-size: 16px;
+    color: var(--bgColor);
+    overflow:hidden;
+}
+
+.bullet {
+    padding: 1px;
 }

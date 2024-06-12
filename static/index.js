@@ -1,13 +1,18 @@
 // Constants 
 INDENT = 20;
 
-// Dynamic Textfield functionality
-function updateFieldSize(el) {
-    console.log(el.style.height);
-    bulletEl = el.parentElement;
-    numRows = ((el.value.length / 50) | 0) + 1;
-    bulletEl.style.height = 2*numRows.toString()+"ex";
-    el.style.height=2*numRows.toString()+"ex";
+function copyTestPlan() {
+    let bodyEl = document.body;
+    let result = "";
+    console.log(bodyEl.children)
+    for (i=2; i<bodyEl.children.length; i++) {
+        child=bodyEl.children[i]
+        console.log(child.id)
+        let jsBullet = new BulletList(JSON.parse(sessionStorage.getItem(child.id)));
+        let indent = 5*jsBullet.depth;
+        result += " ".repeat(indent)+jsBullet.name+"\n";
+    }
+    navigator.clipboard.writeText(result);
 }
 
 // Button / checkbox functionality
@@ -15,7 +20,7 @@ function updateFieldSize(el) {
 function addClick(el) {
     var bullet = el.parentElement
     var jsBullet = new BulletList(JSON.parse(sessionStorage.getItem(bullet.id)))
-    var newBullet = jsBullet.addSubBullet("test")
+    var newBullet = jsBullet.addSubBullet()
     sessionStorage.setItem(newBullet.id,JSON.stringify(newBullet))
     sessionStorage.setItem(jsBullet.id,JSON.stringify(jsBullet))
 }
