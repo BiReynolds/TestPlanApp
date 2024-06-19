@@ -4,13 +4,17 @@ INDENT = 20;
 function copyTestPlan() {
     let bodyEl = document.body;
     let result = "";
-    console.log(bodyEl.children)
     for (i=2; i<bodyEl.children.length; i++) {
         child=bodyEl.children[i]
-        console.log(child.id)
         let jsBullet = new BulletList(JSON.parse(sessionStorage.getItem(child.id)));
+        console.log(jsBullet.readonly)
+        if (!jsBullet.readonly) {
+            jsBullet.toggleReadonly();
+        }
+        console.log(jsBullet.readonly)
         let indent = 5*jsBullet.depth;
-        result += " ".repeat(indent)+jsBullet.name+"\n";
+        let bullet = '\u2022'
+        result += " ".repeat(indent)+bullet+jsBullet.name+"\n";
     }
     navigator.clipboard.writeText(result);
 }
@@ -19,7 +23,7 @@ function copyTestPlan() {
 
 function addClick(el) {
     var bullet = el.parentElement
-    var jsBullet = new BulletList(JSON.parse(sessionStorage.getItem(bullet.id)))
+    var jsBullet = new BulletList(JSON.parse(sessionStorage.getItem(bullet.id)));
     var newBullet = jsBullet.addSubBullet()
     sessionStorage.setItem(newBullet.id,JSON.stringify(newBullet))
     sessionStorage.setItem(jsBullet.id,JSON.stringify(jsBullet))
@@ -27,7 +31,7 @@ function addClick(el) {
 
 function toggleClick(el) {
     var bullet = el.parentElement
-    var jsBullet = new BulletList(JSON.parse(sessionStorage.getItem(bullet.id)))
+    var jsBullet = new BulletList(JSON.parse(sessionStorage.getItem(bullet.id)));
     jsBullet.toggleComplete()
 }
 
@@ -60,7 +64,7 @@ class BulletList {
         this.numChildren = bleh.numChildren;
         this.depth=bleh.depth;
         this.id = bleh.id;
-        this.readonly = false;
+        this.readonly = bleh.readonly;
         this.htmlString=bleh.htmlString;
     }
 
@@ -93,7 +97,7 @@ class BulletList {
         var i=0;
         while (i<this.numChildren){
             var childId = this.id+"."+i.toString();
-            children.push(new BulletList(JSON.parse(sessionStorage.getItem(childId))));
+            children.push(JSON.parse(sessionStorage.getItem(childId)));
             i+=1;
         }
         var result = true;
@@ -140,4 +144,10 @@ function makeBaseNode() {
     var baseBullet = new BulletList("base","base");
     document.body.insertAdjacentHTML("beforeend",baseBullet.htmlString);
     sessionStorage.setItem("base",JSON.stringify(baseBullet));
+}
+
+function storageLoad() {
+    for (key in localStorage) {
+        console.log(key);
+    }
 }
