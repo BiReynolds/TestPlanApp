@@ -13,7 +13,7 @@ function makeHTMLBullet(id,bulletData) {
     let newBullet = document.createElement("div");
     newBullet.classList.add("bullet");
     newBullet.id = id;
-    newBullet.innerHTML = `<input type="checkbox" onclick="toggleClick(this)"> <textarea spellcheck="false" wrap="hard" cols="48" value=${bulletData.name}"></textarea><button type="button" onclick="editClick(this)">Save</button><button type="button" onclick="addClick(this)">+</button>`
+    newBullet.innerHTML = `<input type="checkbox" onclick="toggleClick(this)"> <textarea spellcheck="false" wrap="hard" cols="48" >${bulletData.fieldText}</textarea><button type="button" onclick="editClick(this)">Lock</button><button type="button" onclick="addClick(this)">+</button><button type="button" onclick="deleteClick(this)">-</button>`
     if (bulletData.done) {
         newBullet.children[0].checked = true;
     }
@@ -30,10 +30,18 @@ function addBullet(id,proto=null) {
     let newHTMLBullet;
     if (proto) {
         newBullet = new Bullet(proto.fieldText,proto.done,proto.readOnly);
-        bulletKeys.push(id);
         bulletDict[id]=newBullet;
+        let parentId = getParentId(id);
         newHTMLBullet=makeHTMLBullet(id,newBullet)
-        document.body.appendChild(newHTMLBullet);
+        if (parentId) {
+            let parentBullet = bulletDict[parentId];
+            let parentBulletHTML = document.getElementById(parentId);
+            parentBullet.numChildren += 1;
+            parentBulletHTML.appendChild(newHTMLBullet);
+            newHTMLBullet.style.marginLeft = INDENT;
+        } else {
+            document.body.appendChild(newHTMLBullet);
+        }
     } else {
         newBullet = new Bullet();
         bulletKeys.push(id);
@@ -49,6 +57,24 @@ function addBullet(id,proto=null) {
         } else {
             document.body.appendChild(newHTMLBullet);
         }
+    }
+}
+
+function deleteBullet(id) {
+    let N = id.length;
+    let checklist = [...bulletKeys]
+    let i=0
+    for (key of checklist) {
+        console.log(key);
+        if (key.slice(0,N)==id) {
+            console.log("Deleting");
+            bulletKeys.splice(i,1);
+            i-=1;
+            delete bulletDict[key];
+        } else {
+            console.log("not deleting");
+        }
+        i++;
     }
 }
 
@@ -97,14 +123,21 @@ var INDENT = "20px";
 var bgColor = localStorage['bgColor'];
 var secondaryColor = localStorage['secondaryColor'];
 var textColor = localStorage['textColor'];
-var bulletKeys = localStorage['bulletKeys'] || [];
-
-if (!bulletKeys || bulletKeys.length==0) {
-    addBullet("base");
+if (localStorage['bulletKeys']) {
+    var bulletKeys = JSON.parse(localStorage['bulletKeys']);
+} else {
+    var bulletKeys = [];
 }
 
 function onLoad() {
-    console.log("onLoad called");
+    let checklist = [...bulletKeys];
+    if (!checklist || checklist.length==0) {
+        addBullet("base");
+    } else {
+        for (let id of checklist) {
+            addBullet(id,JSON.parse(localStorage[id]));
+        }
+    }
 }
 
 function editClick(el) {
@@ -116,7 +149,7 @@ function editClick(el) {
         editButton.innerHTML = "Edit";
     } else {
         textField.removeAttribute('readonly');
-        editButton.innerHTML = "Save";
+        editButton.innerHTML = "Lock";
     }
 }
 
@@ -140,6 +173,12 @@ function toggleClick(el) {
     }
 }
 
+function deleteClick(el) {
+    bulletId = el.parentElement.id;
+    el.parentElement.remove();
+    deleteBullet(bulletId);
+}
+
 function appendBulletToClipboard(bulletHTML) {
     newStuff = "";
     let checkbox = bulletHTML.children[0];
@@ -150,8 +189,6 @@ function appendBulletToClipboard(bulletHTML) {
         editButton.innerHTML = "Edit";
     }
     let indent = 5*(bulletHTML.id.match(/\./g)||[]).length;
-    console.log(bulletHTML.id);
-    console.log(bulletHTML.id.match(/\./g));
     let bullet = '\u2022';
     let check = '\u2714';
     if (checkbox.checked) {
@@ -159,7 +196,7 @@ function appendBulletToClipboard(bulletHTML) {
     } else {
         newStuff += " ".repeat(indent)+bullet+textField.value+"\n";
     }
-    for (let i=4; i<bulletHTML.children.length; i++) {
+    for (let i=5; i<bulletHTML.children.length; i++) {
         let subBullet = bulletHTML.children[i];
         newStuff += appendBulletToClipboard(subBullet);
     }
@@ -176,7 +213,20 @@ function copyTestPlan() {
     }
     navigator.clipboard.writeText(result);
 }
-/* TODO: 
-- "Copy Test Plan" (should copy to clipboard and format nicely)
-- "Quick-Save Test Plan" function (will store in localStorage (for now))
-*/
+
+function quickSave() {
+    bulletKeys.sort()
+    localStorage.setItem("bulletKeys",JSON.stringify(bulletKeys));
+    console.log(bulletKeys);
+    console.log(bulletDict);
+    for (id of bulletKeys) {
+        currBullet = bulletDict[id];
+        currBullet.fieldText = document.getElementById(id).children[1].value;
+        localStorage.setItem(id,JSON.stringify(bulletDict[id]));
+    }
+}
+
+function clearTestPlan() {
+    localStorage.clear();
+    location.reload(false);
+}

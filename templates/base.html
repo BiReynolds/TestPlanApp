@@ -9,8 +9,12 @@
   </head>
   <body onload="onLoad()">
     <div id="header">
-        <h1>Bullet Heaven</h1>
-        <p><button type="button" onclick="copyTestPlan()">Copy Test Plan (Azure Friendly!)</button></p>
+        <h1>Bullet Heaven</h1><br>
+        <div id="buttons">
+          <button type="button" onclick="copyTestPlan()">Copy Test Plan (Azure Friendly!)</button>
+          <button type="button" onclick="quickSave()">Quick Save</button>
+          <button type="button" onclick="clearTestPlan()">Clear Test Plan</button>
+        </div>
         <hr>
     </div>
     <script src="static/testIndex.js"></script>

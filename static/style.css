@@ -40,13 +40,23 @@ textarea[readonly] {
 
 button {
     vertical-align:middle;
-    border: 0;
+    box-sizing: border-box;
+    border-style:solid;
+    border-width:0px 1px 0px 1px;
+    border-color:var(--bgColor);
     background-color: var(--secondaryColor);
     font-size: 16px;
     color: var(--bgColor);
     overflow:hidden;
 }
 
+#buttons {
+    display: flex;
+    flex-direction:row;
+    gap:20px;
+}
+
 .bullet {
+    position:relative;
     padding: 1px;
 }
